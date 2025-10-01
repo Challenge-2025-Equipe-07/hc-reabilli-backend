@@ -5,12 +5,13 @@ import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 @ToString
 public class RelatedDTO {
+    int id;
     RelatedType type;
     String url;
-    String description;
     String content;
+    int articleId;
+    int userId;
 }

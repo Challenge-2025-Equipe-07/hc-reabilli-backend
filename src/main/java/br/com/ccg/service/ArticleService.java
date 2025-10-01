@@ -29,6 +29,9 @@ public class ArticleService {
     }
 
     public void postArticle(ArticleDTO articleDTO){
-        articleDAO.postArticle(articleDTO);
+        articleDTO.getRelated().forEach(relatedDTO -> {
+            System.out.println(relatedDTO.getType().toString());
+        });
+//        articleDAO.postArticle(articleDTO);
     }
 }

@@ -9,4 +9,8 @@ public enum RelatedType {
     VIDEO,
     TEXT;
 
+
+    public static RelatedType fromText(String enummerator){
+        return RelatedType.valueOf(enummerator.trim().toUpperCase());
+    }
 }

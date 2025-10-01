@@ -1,6 +1,7 @@
 package br.com.ccg.dao;
 
 import br.com.ccg.dto.ArticleDTO;
+import br.com.ccg.enms.RelatedType;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.jboss.logging.Logger;
@@ -16,6 +17,7 @@ public class ArticleDAO {
     private static final String SELECT_ALL_ARTICLES = "SELECT * FROM T_CCG_ARTICLE";
     private static final String SELECT_BY_ID = "SELECT * FROM T_CCG_ARTICLE WHERE ID_ARTICLE= ?";
     public static final String INSERT_ARTICLE = "INSERT INTO t_ccg_article (id_article, nm_article, t_ccg_user_id_user) values ";
+    public static final String INSERT_RELATED = "INSERT INTO T_CCG_RELATED (ID_RELATED. DS_TYPE, DS_URL, DS_CONTENT, T_CCG_ARTICLE_ID_ARTICLE, ID_USER) values (?,?,?,?,?,?)";
     public static final String UPDATE_ARTICLE = "UPDATE T_CCG_ARTICLE SET NM_ARTICLE = ?, T_CCG_USER_ID_USER= ? WHERE ID_ARTICLE = ?";
     public static final String DELETE_ARTICLE = "DELETE FROM T_CCG_ARTICLE WHERE ID_ARTICLE = ?";
 
@@ -86,10 +88,23 @@ public class ArticleDAO {
         }
     }
     public void postArticle(ArticleDTO dto) {
+        Connection connection = ConnectionFactory.getConnection();
         try {
-            Connection connection = ConnectionFactory.getConnection();
             Statement statement = connection.createStatement();
             statement.executeUpdate(INSERT_ARTICLE + "(" + dto.getArticleId() + ",'" + dto.getName() + "', " + dto.getUserId() + ")");
+            PreparedStatement ps = connection.prepareStatement(INSERT_RELATED);
+            dto.getRelated().forEach(relatedDTO -> {
+                try {
+                    ps.setInt(1, relatedDTO.getId());
+                    ps.setString(2, relatedDTO.getType().toString());
+                    ps.setString(3, relatedDTO.getUrl());
+                    ps.setString(4, relatedDTO.getContent());
+                    ps.setInt(5, dto.getArticleId());
+                    ps.setInt(6, relatedDTO.getUserId());
+                } catch (SQLException e){
+                    logger.error("Error when sending related Object: " + e.getMessage());
+                }
+            });
             connection.close();
         } catch (SQLException e) {
             logger.error(e.getMessage());
