@@ -31,7 +31,7 @@ public class ArticleResource {
     }
 
     @PUT
-    @Path("/{id}/update")
+    @Path("/{id}")
     public void updateArticle(@PathParam("id") String id, ArticleDTO articleDTO) {
         articleService.updateArticle(id, articleDTO);
     }
@@ -42,7 +42,7 @@ public class ArticleResource {
     }
 
     @DELETE
-    @Path("/{id}/delete")
+    @Path("/{id}")
     public void deleteArticle(@PathParam("id") String id) {
         articleService.deleteArticle(id);
     }

@@ -1,7 +1,6 @@
 package br.com.ccg.dao;
 
 import br.com.ccg.dto.ArticleDTO;
-import br.com.ccg.enms.RelatedType;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.jboss.logging.Logger;
