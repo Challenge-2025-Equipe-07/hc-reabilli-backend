@@ -18,7 +18,7 @@ public class ConnectionFactory {
         } catch (ClassNotFoundException | SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            Logger.getLogger(userDAO.class).info("Conexao estabelecida com o banco de daods.");
+            Logger.getLogger(ConnectionFactory.class).info("Conexao estabelecida com o banco de dados.");
         }
     }
 

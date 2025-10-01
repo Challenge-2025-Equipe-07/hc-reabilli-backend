@@ -8,6 +8,7 @@ import org.jboss.logging.Logger;
 
 import java.sql.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ public class ArticleDAO {
     private static final String SELECT_ALL_ARTICLES = "SELECT * FROM T_CCG_ARTICLE ORDER BY ID_ARTICLE ASC";
     private static final String SELECT_BY_ID = "SELECT * FROM T_CCG_ARTICLE WHERE ID_ARTICLE= ?";
     public static final String INSERT_ARTICLE = "INSERT INTO t_ccg_article (id_article, nm_article, t_ccg_user_id_user) values (?,?,?)";
-    public static final String INSERT_RELATED = "INSERT INTO T_CCG_RELATED (ID_RELATED. DS_TYPE, DS_URL, DS_CONTENT, T_CCG_ARTICLE_ID_ARTICLE, ID_USER) values (?,?,?,?,?,?)";
+    public static final String INSERT_RELATED = "INSERT INTO T_CCG_RELATED (ID_RELATED, DS_TYPE, DS_URL, DS_CONTENT, T_CCG_ARTICLE_ID_ARTICLE, ID_USER) values (?,?,?,?,?,?)";
     public static final String UPDATE_ARTICLE = "UPDATE T_CCG_ARTICLE SET NM_ARTICLE = ?, T_CCG_USER_ID_USER= ? WHERE ID_ARTICLE = ?";
     public static final String DELETE_ARTICLE = "DELETE FROM T_CCG_ARTICLE WHERE ID_ARTICLE = ?";
 
@@ -102,19 +103,21 @@ public class ArticleDAO {
             statement.setString(2, dto.getName());
             statement.setInt(3, dto.getUserId());
             statement.executeUpdate();
-            dto.getRelated().forEach(relatedDTO -> {
-                try {
-                    ps.setInt(1, relatedDTO.getId());
-                    ps.setString(2, relatedDTO.getType().toUpperCase());
-                    ps.setString(3, relatedDTO.getUrl());
-                    ps.setString(4, relatedDTO.getContent());
-                    ps.setInt(5, dto.getArticleId());
-                    ps.setInt(6, relatedDTO.getUserId());
-                    ps.addBatch();
-                } catch (SQLException e) {
-                    logger.error("Error when sending related Object: " + e.getMessage());
-                }
-            });
+            if(Objects.nonNull(dto.getRelated())) {
+                dto.getRelated().forEach(relatedDTO -> {
+                    try {
+                        ps.setInt(1, relatedDTO.getId());
+                        ps.setString(2, relatedDTO.getType().toUpperCase());
+                        ps.setString(3, relatedDTO.getUrl());
+                        ps.setString(4, relatedDTO.getContent());
+                        ps.setInt(5, dto.getArticleId());
+                        ps.setInt(6, relatedDTO.getUserId());
+                        ps.addBatch();
+                    } catch (SQLException e) {
+                        logger.error("Error when sending related Object: " + e.getMessage());
+                    }
+                });
+            }
             ps.executeBatch();
         } catch (SQLException e) {
             logger.error(e.getMessage());
