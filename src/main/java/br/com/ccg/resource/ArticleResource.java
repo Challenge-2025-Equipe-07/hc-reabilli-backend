@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Path("/article")
@@ -25,7 +26,7 @@ public class ArticleResource {
 
     @GET
     @Path("/{id}")
-    public ArticleDTO getArticleById(@PathParam("id") String id) {
+    public Optional<ArticleDTO> getArticleById(@PathParam("id") String id) {
         return articleService.getArticleById(id);
     }
 

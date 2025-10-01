@@ -9,7 +9,7 @@ import lombok.*;
 @ToString
 public class RelatedDTO {
     int id;
-    RelatedType type;
+    String type;
     String url;
     String content;
     int articleId;

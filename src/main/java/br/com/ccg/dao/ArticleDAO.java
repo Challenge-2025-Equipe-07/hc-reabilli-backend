@@ -8,15 +8,16 @@ import org.jboss.logging.Logger;
 
 import java.sql.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @ApplicationScoped
 @RequiredArgsConstructor
 public class ArticleDAO {
 
-    private static final String SELECT_ALL_ARTICLES = "SELECT * FROM T_CCG_ARTICLE";
+    private static final String SELECT_ALL_ARTICLES = "SELECT * FROM T_CCG_ARTICLE ORDER BY ID_ARTICLE ASC";
     private static final String SELECT_BY_ID = "SELECT * FROM T_CCG_ARTICLE WHERE ID_ARTICLE= ?";
-    public static final String INSERT_ARTICLE = "INSERT INTO t_ccg_article (id_article, nm_article, t_ccg_user_id_user) values ";
+    public static final String INSERT_ARTICLE = "INSERT INTO t_ccg_article (id_article, nm_article, t_ccg_user_id_user) values (?,?,?)";
     public static final String INSERT_RELATED = "INSERT INTO T_CCG_RELATED (ID_RELATED. DS_TYPE, DS_URL, DS_CONTENT, T_CCG_ARTICLE_ID_ARTICLE, ID_USER) values (?,?,?,?,?,?)";
     public static final String UPDATE_ARTICLE = "UPDATE T_CCG_ARTICLE SET NM_ARTICLE = ?, T_CCG_USER_ID_USER= ? WHERE ID_ARTICLE = ?";
     public static final String DELETE_ARTICLE = "DELETE FROM T_CCG_ARTICLE WHERE ID_ARTICLE = ?";
@@ -24,51 +25,55 @@ public class ArticleDAO {
     private Logger logger = Logger.getLogger(ArticleDAO.class);
 
     public Set<ArticleDTO> getArticles() {
-        try {
-            Connection connection = ConnectionFactory.getConnection();
-            ResultSet rs = connection.createStatement().executeQuery(SELECT_ALL_ARTICLES);
-            Set<ArticleDTO> articleSet = new HashSet<>();
+        Set<ArticleDTO> articles = new HashSet<>();
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(SELECT_ALL_ARTICLES)) {
+
             while (rs.next()) {
-                articleSet.add(ArticleDTO.builder()
+                articles.add(ArticleDTO.builder()
                         .articleId(rs.getInt("ID_ARTICLE"))
                         .name(rs.getString("NM_ARTICLE"))
                         .userId(rs.getInt("T_CCG_USER_ID_USER"))
                         .build());
             }
-            connection.close();
-            return articleSet;
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
+
+        } catch (SQLException ex) {
+            logger.error("Error fetching articles", ex);
             return Set.of();
         }
+        return articles;
     }
 
-    public ArticleDTO getArticleById(String id) {
-        ArticleDTO returnedDto = ArticleDTO.builder().build();
-        try {
-            Connection connection = ConnectionFactory.getConnection();
-            PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID);
-            statement.setInt(1,Integer.parseInt(id));
-            ResultSet rs = statement.executeQuery();
-            if (rs.next()) {
-                returnedDto = ArticleDTO
-                        .builder()
-                        .articleId(rs.getInt("ID_ARTICLE"))
-                        .name(rs.getString("NM_ARTICLE"))
-                        .userId(rs.getInt("T_CCG_USER_ID_USER"))
-                        .build();
+    public Optional<ArticleDTO> getArticleById(String id) {
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
+
+            statement.setInt(1, Integer.parseInt(id));
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    ArticleDTO article = ArticleDTO.builder()
+                            .articleId(rs.getInt("ID_ARTICLE"))
+                            .name(rs.getString("NM_ARTICLE"))
+                            .userId(rs.getInt("T_CCG_USER_ID_USER"))
+                            .build();
+                    return Optional.of(article);
+                }
             }
-            connection.close();
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            logger.error("Error fetching article with id={}", id, e);
+        } catch (NumberFormatException e) {
+            logger.warn("Invalid article id format: {}", id, e);
         }
-        return returnedDto;
+
+        return Optional.empty();
     }
 
     public void updateArticle(String id, ArticleDTO dto) {
-        try{
-            Connection connection = ConnectionFactory.getConnection();
-            PreparedStatement statement = connection.prepareStatement(UPDATE_ARTICLE);
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_ARTICLE)) {
             statement.setString(1, dto.getName());
             statement.setInt(2, dto.getUserId());
             statement.setInt(3, Integer.parseInt(id));
@@ -79,33 +84,38 @@ public class ArticleDAO {
     }
 
     public void deleteArticle(String id) {
-        try {
-            Connection connection = ConnectionFactory.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ARTICLE);
-            connection.close();
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ARTICLE)) {
+            preparedStatement.setInt(1, Integer.parseInt(id));
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             logger.error(e.getMessage());
         }
     }
+
     public void postArticle(ArticleDTO dto) {
-        Connection connection = ConnectionFactory.getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(INSERT_ARTICLE + "(" + dto.getArticleId() + ",'" + dto.getName() + "', " + dto.getUserId() + ")");
-            PreparedStatement ps = connection.prepareStatement(INSERT_RELATED);
+
+        try (Connection connection = ConnectionFactory.getConnection();
+             PreparedStatement statement = connection.prepareStatement(INSERT_ARTICLE);
+             PreparedStatement ps = connection.prepareStatement(INSERT_RELATED)) {
+            statement.setInt(1, dto.getArticleId());
+            statement.setString(2, dto.getName());
+            statement.setInt(3, dto.getUserId());
+            statement.executeUpdate();
             dto.getRelated().forEach(relatedDTO -> {
                 try {
                     ps.setInt(1, relatedDTO.getId());
-                    ps.setString(2, relatedDTO.getType().toString());
+                    ps.setString(2, relatedDTO.getType().toUpperCase());
                     ps.setString(3, relatedDTO.getUrl());
                     ps.setString(4, relatedDTO.getContent());
                     ps.setInt(5, dto.getArticleId());
                     ps.setInt(6, relatedDTO.getUserId());
-                } catch (SQLException e){
+                    ps.addBatch();
+                } catch (SQLException e) {
                     logger.error("Error when sending related Object: " + e.getMessage());
                 }
             });
-            connection.close();
+            ps.executeBatch();
         } catch (SQLException e) {
             logger.error(e.getMessage());
         }
