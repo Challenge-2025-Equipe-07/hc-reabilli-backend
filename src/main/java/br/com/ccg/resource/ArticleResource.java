@@ -26,9 +26,7 @@ public class ArticleResource {
     @GET
     @Path("/{id}")
     public ArticleDTO getArticleById(@PathParam("id") String id) {
-//        Set<RelatedDTO> relatedDTOSet = new HashSet<>();
-//        relatedDTOSet.add(new RelatedDTO(RelatedType.valueOf("TEXT"),"url","desc","abc"));
-        return new ArticleDTO(1, "Artigo", null);
+        return articleService.getArticleById(id);
     }
 
     @PUT

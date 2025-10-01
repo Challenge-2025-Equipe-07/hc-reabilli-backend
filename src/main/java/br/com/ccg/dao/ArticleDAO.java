@@ -14,50 +14,85 @@ import java.util.Set;
 public class ArticleDAO {
 
     private static final String SELECT_ALL_ARTICLES = "SELECT * FROM T_CCG_ARTICLE";
+    private static final String SELECT_BY_ID = "SELECT * FROM T_CCG_ARTICLE WHERE ID_ARTICLE= ?";
+    public static final String INSERT_ARTICLE = "INSERT INTO t_ccg_article (id_article, nm_article, t_ccg_user_id_user) values ";
+    public static final String UPDATE_ARTICLE = "UPDATE T_CCG_ARTICLE SET NM_ARTICLE = ?, T_CCG_USER_ID_USER= ? WHERE ID_ARTICLE = ?";
+    public static final String DELETE_ARTICLE = "DELETE FROM T_CCG_ARTICLE WHERE ID_ARTICLE = ?";
+
+    private Logger logger = Logger.getLogger(ArticleDAO.class);
 
     public Set<ArticleDTO> getArticles() {
-        Connection connection = getConnection();
         try {
-            Statement statement = connection.createStatement();
-            ResultSet countRs = statement.executeQuery("SELECT COUNT(*) FROM T_CCG_ARTICLE");
-            if (countRs.next()) {
-                int count = countRs.getInt(1); // Get the first column (COUNT(*)) value
-                System.out.println("Number of articles: " + count);
-            }ResultSet rs = statement.executeQuery("SELECT * FROM T_CCG_ARTICLE");
+            Connection connection = ConnectionFactory.getConnection();
+            ResultSet rs = connection.createStatement().executeQuery(SELECT_ALL_ARTICLES);
             Set<ArticleDTO> articleSet = new HashSet<>();
             while (rs.next()) {
-                articleSet.add(new ArticleDTO(rs.getInt("ID_ARTICLE"), rs.getString("NM_ARTICLE"), null));
+                articleSet.add(ArticleDTO.builder()
+                        .articleId(rs.getInt("ID_ARTICLE"))
+                        .name(rs.getString("NM_ARTICLE"))
+                        .userId(rs.getInt("T_CCG_USER_ID_USER"))
+                        .build());
             }
             connection.close();
             return articleSet;
         } catch (SQLException e) {
-            Logger.getLogger(ArticleDAO.class).error(e.getMessage());
+            logger.error(e.getMessage());
+            return Set.of();
         }
-        return Set.of();
     }
 
     public ArticleDTO getArticleById(String id) {
-        return new ArticleDTO();
+        ArticleDTO returnedDto = ArticleDTO.builder().build();
+        try {
+            Connection connection = ConnectionFactory.getConnection();
+            PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID);
+            statement.setInt(1,Integer.parseInt(id));
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                returnedDto = ArticleDTO
+                        .builder()
+                        .articleId(rs.getInt("ID_ARTICLE"))
+                        .name(rs.getString("NM_ARTICLE"))
+                        .userId(rs.getInt("T_CCG_USER_ID_USER"))
+                        .build();
+            }
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+        return returnedDto;
     }
 
     public void updateArticle(String id, ArticleDTO dto) {
-
+        try{
+            Connection connection = ConnectionFactory.getConnection();
+            PreparedStatement statement = connection.prepareStatement(UPDATE_ARTICLE);
+            statement.setString(1, dto.getName());
+            statement.setInt(2, dto.getUserId());
+            statement.setInt(3, Integer.parseInt(id));
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     public void deleteArticle(String id) {
-
-    }
-
-    public void postArticle(ArticleDTO dto) {
-
-    }
-
-    private Connection getConnection() {
         try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            return DriverManager.getConnection("jdbc:oracle:thin:@oracle.fiap.com.br:1521:orcl", "RM562700", "090805");
-        } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
+            Connection connection = ConnectionFactory.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ARTICLE);
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+    }
+    public void postArticle(ArticleDTO dto) {
+        try {
+            Connection connection = ConnectionFactory.getConnection();
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(INSERT_ARTICLE + "(" + dto.getArticleId() + ",'" + dto.getName() + "', " + dto.getUserId() + ")");
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
     }
 }
