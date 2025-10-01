@@ -10,5 +10,7 @@ import java.util.Set;
 @NoArgsConstructor
 @ToString
 public class ArticleDTO {
-   Set<ContentDTO> content;
+    int articleId;
+    String name;
+    Set<RelatedDTO> related;
 }

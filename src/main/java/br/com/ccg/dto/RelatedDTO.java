@@ -1,5 +1,6 @@
 package br.com.ccg.dto;
 
+import br.com.ccg.enms.RelatedType;
 import lombok.*;
 
 @Getter
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class RelatedDTO {
-    String type;
+    RelatedType type;
     String url;
     String description;
     String content;

@@ -1,6 +1,5 @@
 package br.com.ccg.resource;
 
-import br.com.ccg.dao.ArticleDAO;
 import br.com.ccg.dto.ArticleDTO;
 import br.com.ccg.service.ArticleService;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -20,27 +19,32 @@ public class ArticleResource {
     ArticleService articleService;
 
     @GET
-    public Set<ArticleDTO> getArticlesByName(@QueryParam("searchParam") String search){
-        return articleService.getArticlesByName(search);
+    public Set<ArticleDTO> getArticles() {
+        return articleService.getArticles();
     }
 
     @GET
     @Path("/{id}")
-    public ArticleDTO getArticleById(@PathParam("id") String id){
-        return articleService.getArticleById(id);
+    public ArticleDTO getArticleById(@PathParam("id") String id) {
+//        Set<RelatedDTO> relatedDTOSet = new HashSet<>();
+//        relatedDTOSet.add(new RelatedDTO(RelatedType.valueOf("TEXT"),"url","desc","abc"));
+        return new ArticleDTO(1, "Artigo", null);
     }
+
     @PUT
     @Path("/{id}/update")
-    public void updateArticle(@PathParam("id") String id, ArticleDTO articleDTO){
+    public void updateArticle(@PathParam("id") String id, ArticleDTO articleDTO) {
         articleService.updateArticle(id, articleDTO);
     }
+
     @POST
-    public void postArticle(ArticleDTO articleDTO){
-        System.out.println(articleDTO);
+    public void postArticle(ArticleDTO articleDTO) {
+        articleService.postArticle(articleDTO);
     }
+
     @DELETE
     @Path("/{id}/delete")
-    public void deleteArticle(@PathParam("id") String id){
+    public void deleteArticle(@PathParam("id") String id) {
         articleService.deleteArticle(id);
     }
 }

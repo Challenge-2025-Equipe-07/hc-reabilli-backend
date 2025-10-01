@@ -13,8 +13,8 @@ public class ArticleService {
     @Inject
     ArticleDAO articleDAO;
 
-    public Set<ArticleDTO> getArticlesByName(String search){
-        return articleDAO.getArticlesByName(search);
+    public Set<ArticleDTO> getArticles(){
+        return articleDAO.getArticles();
     }
 
     public ArticleDTO getArticleById(String id){
@@ -28,7 +28,7 @@ public class ArticleService {
         articleDAO.deleteArticle(id);
     }
 
-    public void postArticle(ArticleDTO articleDTO) {
-        System.out.println(articleDTO);
+    public void postArticle(ArticleDTO articleDTO){
+        articleDAO.postArticle(articleDTO);
     }
 }
