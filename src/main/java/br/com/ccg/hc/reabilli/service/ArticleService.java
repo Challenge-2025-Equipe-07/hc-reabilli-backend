@@ -1,7 +1,7 @@
-package br.com.ccg.service;
+package br.com.ccg.hc.reabilli.service;
 
-import br.com.ccg.dao.ArticleDAO;
-import br.com.ccg.model.Article;
+import br.com.ccg.hc.reabilli.dao.ArticleDAO;
+import br.com.ccg.hc.reabilli.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 

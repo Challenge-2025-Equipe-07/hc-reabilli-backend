@@ -1,7 +1,7 @@
-package br.com.ccg.resource;
+package br.com.ccg.hc.reabilli.resource;
 
-import br.com.ccg.model.User;
-import br.com.ccg.service.UserService;
+import br.com.ccg.hc.reabilli.model.User;
+import br.com.ccg.hc.reabilli.service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;

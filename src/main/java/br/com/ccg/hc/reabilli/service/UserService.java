@@ -1,8 +1,8 @@
-package br.com.ccg.service;
+package br.com.ccg.hc.reabilli.service;
 
-import br.com.ccg.dao.UserDAO;
-import br.com.ccg.model.Login;
-import br.com.ccg.model.User;
+import br.com.ccg.hc.reabilli.dao.UserDAO;
+import br.com.ccg.hc.reabilli.model.Login;
+import br.com.ccg.hc.reabilli.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 

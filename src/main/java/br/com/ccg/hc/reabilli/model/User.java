@@ -1,4 +1,4 @@
-package br.com.ccg.model;
+package br.com.ccg.hc.reabilli.model;
 
 import lombok.Builder;
 import lombok.Getter;

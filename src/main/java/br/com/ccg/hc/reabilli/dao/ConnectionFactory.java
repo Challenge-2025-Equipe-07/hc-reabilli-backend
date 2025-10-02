@@ -1,4 +1,4 @@
-package br.com.ccg.dao;
+package br.com.ccg.hc.reabilli.dao;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.jboss.logging.Logger;

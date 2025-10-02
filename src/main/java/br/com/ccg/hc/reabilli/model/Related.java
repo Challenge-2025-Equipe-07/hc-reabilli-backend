@@ -1,15 +1,16 @@
 package br.com.ccg.hc.reabilli.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
+@Setter
+@Builder
+@ToString
 public class Related {
-    RelatedType type;
+    int id;
+    String type;
     String url;
-    String description;
     String content;
+    int articleId;
+    int userId;
 }

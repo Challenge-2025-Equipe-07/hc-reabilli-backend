@@ -1,14 +1,16 @@
 package br.com.ccg.hc.reabilli.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
+@Setter
+@Builder
+@ToString
 public class Article {
-    List<Content> content;
+    int articleId;
+    String name;
+    Set<Related> related;
+    int userId;
 }

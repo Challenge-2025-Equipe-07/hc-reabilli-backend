@@ -1,6 +1,6 @@
-package br.com.ccg.dao;
+package br.com.ccg.hc.reabilli.dao;
 
-import br.com.ccg.model.Article;
+import br.com.ccg.hc.reabilli.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.jboss.logging.Logger;
