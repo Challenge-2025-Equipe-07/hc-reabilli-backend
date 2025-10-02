@@ -1,13 +1,12 @@
-package br.com.ccg.dto;
+package br.com.ccg.model;
 
-import br.com.ccg.enms.RelatedType;
 import lombok.*;
 
 @Getter
 @Setter
 @Builder
 @ToString
-public class RelatedDTO {
+public class Related {
     int id;
     String type;
     String url;

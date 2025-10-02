@@ -1,6 +1,6 @@
 package br.com.ccg.resource;
 
-import br.com.ccg.dto.ArticleDTO;
+import br.com.ccg.model.Article;
 import br.com.ccg.service.ArticleService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -20,25 +20,25 @@ public class ArticleResource {
     ArticleService articleService;
 
     @GET
-    public Set<ArticleDTO> getArticles() {
+    public Set<Article> getArticles() {
         return articleService.getArticles();
     }
 
     @GET
     @Path("/{id}")
-    public Optional<ArticleDTO> getArticleById(@PathParam("id") String id) {
+    public Optional<Article> getArticleById(@PathParam("id") String id) {
         return articleService.getArticleById(id);
     }
 
     @PUT
     @Path("/{id}")
-    public void updateArticle(@PathParam("id") String id, ArticleDTO articleDTO) {
-        articleService.updateArticle(id, articleDTO);
+    public void updateArticle(@PathParam("id") String id, Article article) {
+        articleService.updateArticle(id, article);
     }
 
     @POST
-    public void postArticle(ArticleDTO articleDTO) {
-        articleService.postArticle(articleDTO);
+    public void postArticle(Article article) {
+        articleService.postArticle(article);
     }
 
     @DELETE

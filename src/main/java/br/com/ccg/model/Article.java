@@ -1,4 +1,4 @@
-package br.com.ccg.dto;
+package br.com.ccg.model;
 
 import lombok.*;
 
@@ -8,9 +8,9 @@ import java.util.Set;
 @Setter
 @Builder
 @ToString
-public class ArticleDTO {
+public class Article {
     int articleId;
     String name;
-    Set<RelatedDTO> related;
+    Set<Related> related;
     int userId;
 }

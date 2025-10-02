@@ -1,6 +1,6 @@
 package br.com.ccg.dao;
 
-import br.com.ccg.dto.ArticleDTO;
+import br.com.ccg.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.jboss.logging.Logger;
@@ -24,15 +24,15 @@ public class ArticleDAO {
 
     private Logger logger = Logger.getLogger(ArticleDAO.class);
 
-    public Set<ArticleDTO> getArticles() {
-        Set<ArticleDTO> articles = new HashSet<>();
+    public Set<Article> getArticles() {
+        Set<Article> articles = new HashSet<>();
 
         try (Connection connection = ConnectionFactory.getConnection();
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(SELECT_ALL_ARTICLES)) {
 
             while (rs.next()) {
-                articles.add(ArticleDTO.builder()
+                articles.add(Article.builder()
                         .articleId(rs.getInt("ID_ARTICLE"))
                         .name(rs.getString("NM_ARTICLE"))
                         .userId(rs.getInt("T_CCG_USER_ID_USER"))
@@ -46,7 +46,7 @@ public class ArticleDAO {
         return articles;
     }
 
-    public Optional<ArticleDTO> getArticleById(String id) {
+    public Optional<Article> getArticleById(String id) {
         try (Connection connection = ConnectionFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
 
@@ -54,7 +54,7 @@ public class ArticleDAO {
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
-                    ArticleDTO article = ArticleDTO.builder()
+                    Article article = Article.builder()
                             .articleId(rs.getInt("ID_ARTICLE"))
                             .name(rs.getString("NM_ARTICLE"))
                             .userId(rs.getInt("T_CCG_USER_ID_USER"))
@@ -71,7 +71,7 @@ public class ArticleDAO {
         return Optional.empty();
     }
 
-    public void updateArticle(String id, ArticleDTO dto) {
+    public void updateArticle(String id, Article dto) {
         try (Connection connection = ConnectionFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_ARTICLE)) {
             statement.setString(1, dto.getName());
@@ -93,7 +93,7 @@ public class ArticleDAO {
         }
     }
 
-    public void postArticle(ArticleDTO dto) {
+    public void postArticle(Article dto) {
 
         try (Connection connection = ConnectionFactory.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_ARTICLE);

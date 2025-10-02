@@ -1,7 +1,7 @@
 package br.com.ccg.service;
 
 import br.com.ccg.dao.ArticleDAO;
-import br.com.ccg.dto.ArticleDTO;
+import br.com.ccg.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -14,14 +14,15 @@ public class ArticleService {
     @Inject
     ArticleDAO articleDAO;
 
-    public Set<ArticleDTO> getArticles(){
+    public Set<Article> getArticles(){
         return articleDAO.getArticles();
     }
 
-    public Optional<ArticleDTO> getArticleById(String id){
+    public Optional<Article> getArticleById(String id){
         return articleDAO.getArticleById(id);
     }
-    public void updateArticle(String id, ArticleDTO dto){
+
+    public void updateArticle(String id, Article dto){
         articleDAO.updateArticle(id, dto);
     }
 
@@ -29,7 +30,7 @@ public class ArticleService {
         articleDAO.deleteArticle(id);
     }
 
-    public void postArticle(ArticleDTO articleDTO){
-        articleDAO.postArticle(articleDTO);
+    public void postArticle(Article article){
+        articleDAO.postArticle(article);
     }
 }

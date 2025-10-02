@@ -1,6 +1,6 @@
 package br.com.ccg.resource;
 
-import br.com.ccg.dto.UserDTO;
+import br.com.ccg.model.User;
 import br.com.ccg.service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,19 +18,19 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
-    public UserDTO getUser(@PathParam("id") String id){
-        return userService.getUser(id);
+    public User getUserById(@PathParam("id") String id){
+        return userService.getUserById(id);
     }
 
     @PUT
     @Path("/{id}")
-    public void putUser(@PathParam("id")String id, UserDTO userDTO){
-        userService.updateUser(id, userDTO);
+    public void updateUser(@PathParam("id")String id, User user){
+        userService.updateUser(id, user);
     }
 
     @POST
-    public void postUser(UserDTO userDTO){
-        userService.postUser(userDTO);
+    public void postUser(User user){
+        userService.postUser(user);
     }
 
     @DELETE

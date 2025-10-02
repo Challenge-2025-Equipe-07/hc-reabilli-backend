@@ -1,6 +1,6 @@
 package br.com.ccg.resource;
 
-import br.com.ccg.dto.LoginDTO;
+import br.com.ccg.model.Login;
 import br.com.ccg.service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,7 +18,7 @@ public class LoginResource {
     UserService userService;
 
     @POST
-    public boolean login(LoginDTO loginDTO){
+    public boolean login(Login loginDTO){
         return userService.getUserByUsername(loginDTO);
     }
 
