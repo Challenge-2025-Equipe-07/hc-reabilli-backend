@@ -1,10 +1,13 @@
 package br.com.ccg.hc.reabilli.dao;
 
 import br.com.ccg.hc.reabilli.model.Article;
+import br.com.ccg.hc.reabilli.model.Related;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.jboss.logging.Logger;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.HashSet;
 import java.util.Objects;
@@ -16,20 +19,25 @@ import java.util.Set;
 public class ArticleDAO {
 
     private static final String SELECT_ALL_ARTICLES = "SELECT * FROM T_CCG_ARTICLE ORDER BY ID_ARTICLE ASC";
+    private static final String GET_RELATED_BY_ARTICLE_ID = "SELECT * FROM T_CCG_RELATED WHERE T_CCG_ARTICLE_ID_ARTICLE = ?";
     private static final String SELECT_BY_ID = "SELECT * FROM T_CCG_ARTICLE WHERE ID_ARTICLE= ?";
     public static final String INSERT_ARTICLE = "INSERT INTO t_ccg_article (id_article, nm_article, t_ccg_user_id_user) values (?,?,?)";
     public static final String INSERT_RELATED = "INSERT INTO T_CCG_RELATED (ID_RELATED, DS_TYPE, DS_URL, DS_CONTENT, T_CCG_ARTICLE_ID_ARTICLE, ID_USER) values (?,?,?,?,?,?)";
     public static final String UPDATE_ARTICLE = "UPDATE T_CCG_ARTICLE SET NM_ARTICLE = ?, T_CCG_USER_ID_USER= ? WHERE ID_ARTICLE = ?";
     public static final String DELETE_ARTICLE = "DELETE FROM T_CCG_ARTICLE WHERE ID_ARTICLE = ?";
 
-    private Logger logger = Logger.getLogger(ArticleDAO.class);
+    private final Logger logger = Logger.getLogger(ArticleDAO.class);
+
+    @Inject
+    DataSource datasource;
 
     public Set<Article> getArticles() {
         Set<Article> articles = new HashSet<>();
 
-        try (Connection connection = ConnectionFactory.getConnection();
+        try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet rs = statement.executeQuery(SELECT_ALL_ARTICLES)) {
+             ResultSet rs = statement.executeQuery(SELECT_ALL_ARTICLES)
+        ) {
 
             while (rs.next()) {
                 articles.add(Article.builder()
@@ -47,10 +55,26 @@ public class ArticleDAO {
     }
 
     public Optional<Article> getArticleById(String id) {
-        try (Connection connection = ConnectionFactory.getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID)) {
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID);
+             PreparedStatement relatedStatement = connection.prepareStatement(GET_RELATED_BY_ARTICLE_ID)
+             ) {
 
+            relatedStatement.setInt(1, Integer.parseInt(id));
             statement.setInt(1, Integer.parseInt(id));
+
+            Set<Related> relatedSet = new HashSet<>();
+            try(ResultSet relatedRs = relatedStatement.executeQuery()){
+                while(relatedRs.next()){
+                    relatedSet.add(Related.builder()
+                            .articleId(Integer.parseInt(id))
+                            .type(relatedRs.getString("DS_TYPE"))
+                            .content(relatedRs.getString("DS_CONTENT"))
+                            .id(relatedRs.getInt("ID_RELATED"))
+                            .userId(relatedRs.getInt("ID_USER"))
+                            .build());
+                }
+            }
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -58,6 +82,7 @@ public class ArticleDAO {
                             .articleId(rs.getInt("ID_ARTICLE"))
                             .name(rs.getString("NM_ARTICLE"))
                             .userId(rs.getInt("T_CCG_USER_ID_USER"))
+                            .related(relatedSet)
                             .build();
                     return Optional.of(article);
                 }
@@ -72,7 +97,7 @@ public class ArticleDAO {
     }
 
     public void updateArticle(String id, Article dto) {
-        try (Connection connection = ConnectionFactory.getConnection();
+        try (Connection connection = datasource.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_ARTICLE)) {
             statement.setString(1, dto.getName());
             statement.setInt(2, dto.getUserId());
@@ -84,7 +109,7 @@ public class ArticleDAO {
     }
 
     public void deleteArticle(String id) {
-        try (Connection connection = ConnectionFactory.getConnection();
+        try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ARTICLE)) {
             preparedStatement.setInt(1, Integer.parseInt(id));
             preparedStatement.executeUpdate();
@@ -95,7 +120,7 @@ public class ArticleDAO {
 
     public void postArticle(Article dto) {
 
-        try (Connection connection = ConnectionFactory.getConnection();
+        try (Connection connection = datasource.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_ARTICLE);
              PreparedStatement ps = connection.prepareStatement(INSERT_RELATED)) {
             statement.setInt(1, dto.getArticleId());

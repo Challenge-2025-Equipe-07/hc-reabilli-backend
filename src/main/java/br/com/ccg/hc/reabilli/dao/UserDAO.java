@@ -3,9 +3,11 @@ package br.com.ccg.hc.reabilli.dao;
 import br.com.ccg.hc.reabilli.model.Login;
 import br.com.ccg.hc.reabilli.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.jboss.logging.Logger;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,15 +17,17 @@ import java.sql.SQLException;
 @RequiredArgsConstructor
 public class UserDAO {
 
-
     private static final String GET_BY_ID = "SELECT * FROM T_CCG_USER WHERE ID_USER = ?";
     private static final String UPDATE_USER = "UPDATE T_CCG_USER SET NM_USER= ?, DS_USERNAME= ?, DS_TOKEN = ? WHERE ID_USER = ?";
     private static final String INSERT_USER = "INSERT INTO T_CCG_USER (ID_USER, NM_USER, DS_USERNAME, DS_TOKEN)VALUES (?, ?, ?, ?)";
     private static final String DELETE_USER = "DELETE FROM T_CCG_USER WHERE ID_USER = ?";
     private static final String GET_BY_USERNAME = "SELECT * FROM T_CCG_USER WHERE DS_USERNAME = ?";
 
+    @Inject
+    DataSource datasource;
+
     public User getUserById(String id) {
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = datasource.getConnection();
              PreparedStatement ps = conn.prepareStatement(GET_BY_ID)) {
             ps.setInt(1, Integer.parseInt(id));
             ResultSet rs = ps.executeQuery();
@@ -43,8 +47,8 @@ public class UserDAO {
 
     public void updateUser(String id, User user) {
         try(
-                Connection conn = ConnectionFactory.getConnection();
-                PreparedStatement preparedStatement = conn.prepareStatement(UPDATE_USER);
+                Connection conn = datasource.getConnection();
+                PreparedStatement preparedStatement = conn.prepareStatement(UPDATE_USER)
                 ){
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getUsername());
@@ -58,8 +62,8 @@ public class UserDAO {
 
     public void postUser(User user) {
         try(
-                Connection conn = ConnectionFactory.getConnection();
-                PreparedStatement preparedStatement = conn.prepareStatement(INSERT_USER);
+                Connection conn = datasource.getConnection();
+                PreparedStatement preparedStatement = conn.prepareStatement(INSERT_USER)
         ){
             preparedStatement.setInt(1, user.getUserId());
             preparedStatement.setString(2, user.getName());
@@ -73,8 +77,8 @@ public class UserDAO {
 
     public void deleteUser(String id) {
         try(
-                Connection conn = ConnectionFactory.getConnection();
-                PreparedStatement preparedStatement = conn.prepareStatement(DELETE_USER);
+                Connection conn = datasource.getConnection();
+                PreparedStatement preparedStatement = conn.prepareStatement(DELETE_USER)
         ){
             preparedStatement.setInt(1, Integer.parseInt(id));
             preparedStatement.executeUpdate();
@@ -84,7 +88,7 @@ public class UserDAO {
     }
 
     public User getUserByUsername(Login login) {
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = datasource.getConnection();
              PreparedStatement ps = conn.prepareStatement(GET_BY_USERNAME)) {
             ps.setString(1, login.getUsername());
             ResultSet rs = ps.executeQuery();
