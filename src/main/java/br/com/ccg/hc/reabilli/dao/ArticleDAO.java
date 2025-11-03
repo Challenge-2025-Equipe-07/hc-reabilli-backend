@@ -5,6 +5,8 @@ import br.com.ccg.hc.reabilli.model.Related;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.jbosslog.JBossLog;
+import lombok.extern.slf4j.Slf4j;
 import org.jboss.logging.Logger;
 
 import javax.sql.DataSource;
@@ -14,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+@JBossLog
 @ApplicationScoped
 @RequiredArgsConstructor
 public class ArticleDAO {
@@ -38,7 +41,6 @@ public class ArticleDAO {
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(SELECT_ALL_ARTICLES)
         ) {
-
             while (rs.next()) {
                 articles.add(Article.builder()
                         .articleId(rs.getInt("ID_ARTICLE"))
@@ -119,32 +121,38 @@ public class ArticleDAO {
     }
 
     public void postArticle(Article dto) {
+        try (Connection connection = datasource.getConnection()) {
+            connection.setAutoCommit(false);
 
-        try (Connection connection = datasource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT_ARTICLE);
-             PreparedStatement ps = connection.prepareStatement(INSERT_RELATED)) {
-            statement.setInt(1, dto.getArticleId());
-            statement.setString(2, dto.getName());
-            statement.setInt(3, dto.getUserId());
-            statement.executeUpdate();
-            if(Objects.nonNull(dto.getRelated())) {
-                dto.getRelated().forEach(relatedDTO -> {
-                    try {
-                        ps.setInt(1, relatedDTO.getId());
-                        ps.setString(2, relatedDTO.getType().toUpperCase());
-                        ps.setString(3, relatedDTO.getUrl());
-                        ps.setString(4, relatedDTO.getContent());
-                        ps.setInt(5, dto.getArticleId());
-                        ps.setInt(6, relatedDTO.getUserId());
-                        ps.addBatch();
-                    } catch (SQLException e) {
-                        logger.error("Error when sending related Object: " + e.getMessage());
-                    }
-                });
+            // Inserir Article
+            try (PreparedStatement psArticle = connection.prepareStatement(
+                    "INSERT INTO t_ccg_article (id_article, nm_article, t_ccg_user_id_user) VALUES (?, ?, ?)")) {
+                psArticle.setInt(1, dto.getArticleId()); // ou recuperar ID gerado se for sequence
+                psArticle.setString(2, dto.getName());
+                psArticle.setInt(3, dto.getUserId());
+                psArticle.executeUpdate();
             }
-            ps.executeBatch();
+
+            // Inserir Related
+            if (dto.getRelated() != null) {
+                try (PreparedStatement psRelated = connection.prepareStatement(
+                        "INSERT INTO T_CCG_RELATED (ID_RELATED, DS_TYPE, DS_URL, DS_CONTENT, T_CCG_ARTICLE_ID_ARTICLE, ID_USER) VALUES (?, ?, ?, ?, ?, ?)")) {
+                    for (Related r : dto.getRelated()) {
+                        psRelated.setInt(1, r.getId());
+                        psRelated.setString(2, r.getType());
+                        psRelated.setString(3, r.getUrl());
+                        psRelated.setString(4, r.getContent());
+                        psRelated.setInt(5, dto.getArticleId()); // mesmo ID do Article inserido
+                        psRelated.setInt(6, r.getUserId());
+                        psRelated.addBatch();
+                    }
+                    psRelated.executeBatch();
+                }
+            }
+
+            connection.commit();
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }
