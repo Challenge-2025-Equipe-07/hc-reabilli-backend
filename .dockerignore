@@ -1,5 +1,5 @@
 # Ignore everything first
-*
+Dockerfile
 
 # But include necessary files for building
 !mvnw

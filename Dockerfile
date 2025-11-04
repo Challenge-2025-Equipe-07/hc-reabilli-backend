@@ -6,7 +6,7 @@ FROM eclipse-temurin:25-jdk-alpine
 WORKDIR /app
 
 # Copy local code to the container image.
-COPY ../../../../../../AppData/Local/Temp ./
+COPY ../../../AppData/Local/Temp ./
 
 RUN chmod +x mvnw
 
