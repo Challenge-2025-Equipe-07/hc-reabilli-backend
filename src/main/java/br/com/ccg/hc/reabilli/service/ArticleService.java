@@ -1,10 +1,11 @@
 package br.com.ccg.hc.reabilli.service;
 
-import br.com.ccg.hc.reabilli.dao.ArticleDAO;
+import br.com.ccg.hc.reabilli.dao.ArticleRepository;
 import br.com.ccg.hc.reabilli.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,25 +13,30 @@ import java.util.Set;
 public class ArticleService {
 
     @Inject
-    ArticleDAO articleDAO;
+    ArticleRepository articleDAO;
 
     public Set<Article> getArticles(){
-        return articleDAO.getArticles();
+        Optional<Set<Article>> articles = articleDAO.findAllWithRelated();
+        if(articles.isPresent()) {
+            return articles.get();
+        } else {
+            throw new NoSuchElementException("No articles found");
+        }
     }
 
-    public Optional<Article> getArticleById(String id){
-        return articleDAO.getArticleById(id);
+    public Optional<Article> getArticleById(int id){
+        return articleDAO.findByIdWithRelated(id);
     }
-
-    public void updateArticle(String id, Article dto){
-        articleDAO.updateArticle(id, dto);
-    }
-
-    public void deleteArticle(String id){
-        articleDAO.deleteArticle(id);
-    }
-
-    public void postArticle(Article article){
-        articleDAO.postArticle(article);
-    }
+//
+//    public void updateArticle(String id, Article dto){
+//        articleDAO.updateArticle(id, dto);
+//    }
+//
+//    public void deleteArticle(String id){
+//        articleDAO.deleteArticle(id);
+//    }
+//
+//    public void postArticle(Article article){
+//        articleDAO.postArticle(article);
+//    }
 }

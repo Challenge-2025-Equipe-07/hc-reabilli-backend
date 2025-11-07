@@ -26,24 +26,24 @@ public class ArticleResource {
 
     @GET
     @Path("/{id}")
-    public Optional<Article> getArticleById(@PathParam("id") String id) {
+    public Optional<Article> getArticleById(@PathParam("id") int id) {
         return articleService.getArticleById(id);
     }
-
-    @PUT
-    @Path("/{id}")
-    public void updateArticle(@PathParam("id") String id, Article article) {
-        articleService.updateArticle(id, article);
-    }
-
-    @POST
-    public void postArticle(Article article) {
-        articleService.postArticle(article);
-    }
-
-    @DELETE
-    @Path("/{id}")
-    public void deleteArticle(@PathParam("id") String id) {
-        articleService.deleteArticle(id);
-    }
+//
+//    @PUT
+//    @Path("/{id}")
+//    public void updateArticle(@PathParam("id") String id, Article article) {
+//        articleService.updateArticle(id, article);
+//    }
+//
+//    @POST
+//    public void postArticle(Article article) {
+//        articleService.postArticle(article);
+//    }
+//
+//    @DELETE
+//    @Path("/{id}")
+//    public void deleteArticle(@PathParam("id") String id) {
+//        articleService.deleteArticle(id);
+//    }
 }
