@@ -4,6 +4,8 @@ import br.com.ccg.hc.reabilli.dao.ArticleRepository;
 import br.com.ccg.hc.reabilli.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.PersistenceException;
+import jakarta.ws.rs.NotFoundException;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -13,30 +15,40 @@ import java.util.Set;
 public class ArticleService {
 
     @Inject
-    ArticleRepository articleDAO;
+    ArticleRepository articleRepository;
 
-    public Set<Article> getArticles(){
-        Optional<Set<Article>> articles = articleDAO.findAllWithRelated();
-        if(articles.isPresent()) {
+    public Set<Article> getArticles() {
+        Optional<Set<Article>> articles = articleRepository.findAllWithRelated();
+        if (articles.isPresent()) {
             return articles.get();
         } else {
             throw new NoSuchElementException("No articles found");
         }
     }
 
-    public Optional<Article> getArticleById(int id){
-        return articleDAO.findByIdWithRelated(id);
+    public Article getArticleById(int id) {
+        Optional<Article> article = articleRepository.findByIdWithRelated(id);
+        if (article.isPresent()) {
+            return article.get();
+        } else {
+            throw new NotFoundException("No articles found");
+        }
     }
-//
-//    public void updateArticle(String id, Article dto){
-//        articleDAO.updateArticle(id, dto);
-//    }
-//
-//    public void deleteArticle(String id){
-//        articleDAO.deleteArticle(id);
-//    }
-//
-//    public void postArticle(Article article){
-//        articleDAO.postArticle(article);
-//    }
+
+    public Optional<Article> updateArticle(int id, Article dto) {
+        return articleRepository.updateArticleWithRelateds(id, dto);
+    }
+
+    public void deleteArticle(int id){
+        articleRepository.deleteArticleAndRelateds(id);
+    }
+
+    public Optional<Article> postArticle(Article article){
+        Optional<Article> postedArticle = Optional.ofNullable(articleRepository.post(article));
+        if(postedArticle.isPresent()){
+            return postedArticle;
+        } else {
+            throw new PersistenceException("Error when persisting article: " + article);
+        }
+    }
 }

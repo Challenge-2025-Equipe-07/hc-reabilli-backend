@@ -1,6 +1,7 @@
 package br.com.ccg.hc.reabilli.resource;
 
 import br.com.ccg.hc.reabilli.model.Login;
+import br.com.ccg.hc.reabilli.model.User;
 import br.com.ccg.hc.reabilli.service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,7 +19,7 @@ public class LoginResource {
     UserService userService;
 
     @POST
-    public boolean login(Login loginDTO){
+    public User login(Login loginDTO){
         return userService.getUserByUsername(loginDTO);
     }
 

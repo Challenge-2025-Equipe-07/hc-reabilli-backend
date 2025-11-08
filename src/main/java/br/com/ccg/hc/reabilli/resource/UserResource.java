@@ -18,13 +18,13 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
-    public User getUserById(@PathParam("id") String id){
+    public User getUserById(@PathParam("id") int id){
         return userService.getUserById(id);
     }
 
     @PUT
     @Path("/{id}")
-    public void updateUser(@PathParam("id")String id, User user){
+    public void updateUser(@PathParam("id")int id, User user){
         userService.updateUser(id, user);
     }
 
@@ -35,7 +35,7 @@ public class UserResource {
 
     @DELETE
     @Path("/{id}")
-    public void deleteUser(@PathParam("id") String id){
+    public void deleteUser(@PathParam("id") int id){
         userService.deleteUser(id);
     }
 

@@ -14,8 +14,10 @@ import lombok.*;
 public class Related {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "related_seq")
+    @SequenceGenerator(name = "related_seq", sequenceName = "SEQ_T_CCG_RELATED", allocationSize = 1)
     @Column(name = "ID_RELATED")
-    private int id;
+    private Long id;
 
     @Column(name = "DS_TYPE")
     private String type;
