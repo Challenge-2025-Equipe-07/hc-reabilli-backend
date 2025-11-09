@@ -42,18 +42,9 @@ public class ArticleResource {
 
     @POST
     public Article postArticle(Article article) {
-        Optional<Article> postedArticle = Optional.empty();
-        try {
-            postedArticle = articleService.postArticle(article);
-        } finally {
-            if (postedArticle.isPresent()) {
-                relatedService.persist(article.getRelated());
-                return postedArticle.get();
-            } else  {
-                throw new NotFoundException("Error when getting posted article: " + article);
-            }
-        }
-
+        Optional<Article> postedArticle;
+        postedArticle = articleService.postArticle(article);
+        return postedArticle.get();
     }
 
     @DELETE

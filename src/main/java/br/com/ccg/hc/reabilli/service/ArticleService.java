@@ -44,7 +44,7 @@ public class ArticleService {
     }
 
     public Optional<Article> postArticle(Article article){
-        Optional<Article> postedArticle = Optional.ofNullable(articleRepository.post(article));
+        Optional<Article> postedArticle = articleRepository.postArticle(article);
         if(postedArticle.isPresent()){
             return postedArticle;
         } else {

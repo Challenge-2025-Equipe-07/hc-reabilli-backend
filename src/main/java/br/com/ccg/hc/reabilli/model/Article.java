@@ -27,6 +27,12 @@ public class Article {
     @Column(name = "T_CCG_USER_ID_USER")
     private int userId;
 
-    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
-    private Set<Related> related;
+    @OneToMany(
+            mappedBy = "article",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, // inclui PERSIST, MERGE, REMOVE...
+            orphanRemoval = true
+    )
+    private Set<Related> related = new HashSet<>();
+
 }
