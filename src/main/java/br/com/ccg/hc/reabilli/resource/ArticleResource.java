@@ -8,7 +8,9 @@ import jakarta.inject.Inject;
 import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
+import java.net.URI;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,38 +20,44 @@ import java.util.Set;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ArticleResource {
 
+
+    private static final String BASE_URI = "http://localhost:8080/";
     @Inject
     ArticleService articleService;
 
     @Inject
     RelatedService relatedService;
+
     @GET
-    public Set<Article> getArticles() {
-        return articleService.getArticles();
+    public Response getArticles() {
+        return Response.ok().entity(articleService.getArticles()).build();
     }
 
     @GET
     @Path("/{id}")
-    public Article getArticleById(@PathParam("id") int id) {
-        return articleService.getArticleById(id);
+    public Response getArticleById(@PathParam("id") int id) {
+        return Response.ok().entity(articleService.getArticleById(id)).build();
     }
 
     @PUT
     @Path("/{id}")
-    public void updateArticle(@PathParam("id") int id, Article article) {
-        articleService.updateArticle(id, article);
+    public Response updateArticle(@PathParam("id") int id, Article article) {
+        return Response.ok().entity(articleService.updateArticle(id, article)).build();
     }
 
     @POST
-    public Article postArticle(Article article) {
+    public Response postArticle(Article article) {
         Optional<Article> postedArticle;
         postedArticle = articleService.postArticle(article);
-        return postedArticle.get();
+        return Response.created(URI.create(BASE_URI + "/article/" + postedArticle.get().getArticleId()))
+                .entity(postedArticle)
+                .build();
     }
 
     @DELETE
     @Path("/{id}")
-    public void deleteArticle(@PathParam("id") int id) {
+    public Response deleteArticle(@PathParam("id") int id) {
         articleService.deleteArticle(id);
+        return Response.noContent().build();
     }
 }
