@@ -2,17 +2,14 @@ package br.com.ccg.hc.reabilli.resource;
 
 import br.com.ccg.hc.reabilli.model.Article;
 import br.com.ccg.hc.reabilli.service.ArticleService;
-import br.com.ccg.hc.reabilli.service.RelatedService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.PersistenceException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.Optional;
-import java.util.Set;
 
 @Path("/article")
 @ApplicationScoped
@@ -24,9 +21,6 @@ public class ArticleResource {
     private static final String BASE_URI = "http://localhost:8080/";
     @Inject
     ArticleService articleService;
-
-    @Inject
-    RelatedService relatedService;
 
     @GET
     public Response getArticles() {

@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class ArticleRepository implements PanacheRepository<Article> {
+public class ArticleDAO implements PanacheRepository<Article> {
 
     public Optional<Set<Article>> findAllWithRelated() {
         return Optional.of(find("SELECT a FROM Article a LEFT JOIN FETCH a.related ORDER BY a.articleId ASC")

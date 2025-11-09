@@ -1,6 +1,6 @@
 package br.com.ccg.hc.reabilli.service;
 
-import br.com.ccg.hc.reabilli.dao.ArticleRepository;
+import br.com.ccg.hc.reabilli.dao.ArticleDAO;
 import br.com.ccg.hc.reabilli.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -15,7 +15,7 @@ import java.util.Set;
 public class ArticleService {
 
     @Inject
-    ArticleRepository articleRepository;
+    ArticleDAO articleRepository;
 
     public Set<Article> getArticles() {
         Optional<Set<Article>> articles = articleRepository.findAllWithRelated();

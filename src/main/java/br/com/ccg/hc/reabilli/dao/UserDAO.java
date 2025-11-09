@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-public class UserRepository implements PanacheRepository<User> {
+public class UserDAO implements PanacheRepository<User> {
 
     public Optional<User> getById(int id) {
         return findByIdOptional((long) id);
